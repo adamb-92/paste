@@ -1,19 +1,24 @@
 const path = require('path');
 
 module.exports = {
-  stories: ['../packages/**/*.stories.@(js|jsx|ts|tsx|mdx)'],
+  stories: [
+    '../packages/**/*.stories.@(js|jsx|ts|tsx|mdx)',
+    '../performance-benchmarks/**/*.stories.@(js|jsx|ts|tsx|mdx)',
+  ],
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-a11y',
-    '@storybook/addon-actions',
-    '@storybook/addon-viewport',
     '@storybook/addon-interactions',
     'storybook-addon-gatsby',
     './addons/google-analytics/register',
   ],
+  framework: '@storybook/react',
   features: {
     interactionsDebugger: true,
+    reactOptions: {legacyRootApi: true},
+    storyStoreV7: true,
+    babelModeV7: true,
   },
   staticDirs: ['./static'],
   typescript: {
@@ -66,7 +71,6 @@ module.exports = {
     // mode. Without doing so, no React profiling data can be extracted from stories
     // When they are deployed.
     const customAlias = {
-      'react-dom': path.resolve(__dirname, '../node_modules/react-dom/profiling'),
       'scheduler/tracing': 'scheduler/tracing-profiling',
       '@emotion/core': path.resolve(__dirname, '../node_modules/@emotion/react'),
       '@emotion/styled': path.resolve(__dirname, '../node_modules/@emotion/styled'),
@@ -76,6 +80,9 @@ module.exports = {
 
     // FIX: Tell Storybook to look at dev files if available
     config.resolve.mainFields = ['main:dev', 'browser', 'module', 'main'];
+
+    // https://github.com/prismicio-community/storybook-addon-gatsby/issues/7
+    config.module.rules[0].exclude = [/node_modules\/(?!(gatsby)\/)/];
 
     return config;
   },
